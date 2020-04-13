@@ -1,0 +1,55 @@
+{
+    "name": "them-cards",
+    "version": "0.0.0",
+    "description": "You know, them cards",
+    "private": true,
+    "scripts": {
+        "dev-server": "concurrently \"tsc -w\"  \"cpx \\\"src/**/*.{html,png,jpg,json}\\\"  \\\"build\\\" --watch --verbose\" \"nodemon build/server/index.js dev\"",
+        "dev-client": "webpack-dev-server --env dev",
+        "build-server": "tsc && cpx \"src/**/*.{html,png,jpg,json}\" \"build\"",
+        "build-client": "webpack --env prod",
+        "start": "set NODE_ENV=production&& node build/server/index.js",
+        "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
+        "build": "npm run build-server && npm run build-client"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/TarVK/themCards.git"
+    },
+    "author": "Tar van Krieken",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/TarVK/themCards/issues"
+    },
+    "homepage": "https://github.com/TarVK/themCards#readme",
+    "dependencies": {
+        "@emotion/core": "^10.0.28",
+        "@fluentui/react": "^7.106.0",
+        "emotion-theming": "^10.0.27",
+        "express": "^4.17.1",
+        "model-react": "^3.0.1",
+        "react": "^16.13.0",
+        "react-dom": "^16.13.0",
+        "socket.io": "^2.3.0",
+        "socket.io-client": "^2.3.0",
+        "uuidv4": "^6.0.6"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.3",
+        "@types/node": "^13.9.2",
+        "@types/react": "^16.9.34",
+        "@types/react-dom": "^16.9.6",
+        "@types/socket.io": "^2.1.4",
+        "@types/socket.io-client": "^1.4.32",
+        "@types/websocket": "^1.0.0",
+        "concurrently": "^5.1.0",
+        "cpx": "^1.5.0",
+        "nodemon": "^2.0.2",
+        "ts-cleaner": "^1.0.5",
+        "ts-loader": "^6.2.1",
+        "typescript": "^3.8.3",
+        "webpack": "^4.42.0",
+        "webpack-cli": "^3.3.11",
+        "webpack-dev-server": "^3.10.3"
+    }
+}
