@@ -299,7 +299,7 @@ export class Room {
             player
                 .getSelection()
                 .forEach(answer => this.cardsSelection.returnAnswer(answer));
-            player.setSelection([]);
+            player.clearSelection();
 
             // Draw new cards
             this.updateHand(player);

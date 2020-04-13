@@ -18,6 +18,7 @@ export const Card: FC<{
                 width: 160,
                 height: 220,
                 boxSizing: "border-box",
+                wordBreak: "break-word",
                 padding: theme.spacing.s1,
                 fontSize: 18,
             }}

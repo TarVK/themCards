@@ -188,6 +188,17 @@ export class Player {
     }
 
     /**
+     * Clears the selected cards of the player
+     */
+    public clearSelection(): void {
+        this.selection = [];
+        this.broadcast(
+            `players/${this.ID}/setSelection`,
+            this.selection.map(card => card.getText())
+        );
+    }
+
+    /**
      * Sets the hand of the player
      * @param hand The new hand
      */
