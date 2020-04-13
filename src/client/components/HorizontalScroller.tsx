@@ -7,7 +7,7 @@ export const HorizontalScroller: FC<{children: ReactNode}> = ({...rest}) => {
     const target = useRef(0);
     const animating = useRef(false);
     const updateTarget = (change: number) => {
-        target.current = Math.max(0, target.current + change);
+        target.current = Math.max(0, target.current + change / 6);
         if (elRef.current) {
             const el = elRef.current;
             target.current = Math.min(target.current, el.scrollWidth - el.clientWidth);
