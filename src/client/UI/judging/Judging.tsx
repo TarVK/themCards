@@ -6,6 +6,7 @@ import {QuestionCard} from "../../components/QuestionCard";
 import {useTheme} from "../../services/useTheme";
 import {Judge} from "./Judge";
 import {ContinueGame} from "./ContinueGame";
+import {useIsMobileView} from "../../services/useIsMobileView";
 
 export const Judging: FC = () => {
     const [h, c] = useDataHook();
@@ -14,6 +15,14 @@ export const Judging: FC = () => {
     const judge = room?.getJudge(h);
 
     const theme = useTheme();
+    if (useIsMobileView())
+        return (
+            <div>
+                {judge && <Judge judge={judge} />}
+                {question && <QuestionCard revealed>{question}</QuestionCard>}
+            </div>
+        );
+
     return (
         <div
             css={{

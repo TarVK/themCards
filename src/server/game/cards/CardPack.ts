@@ -10,6 +10,7 @@ const cardDir = Path.join(process.cwd(), "cardPacks");
 export class CardPack {
     protected name: string;
     protected description: string;
+    protected language: string;
     protected questions: QuestionCard[];
     protected answers: AnswerCard[];
 
@@ -32,6 +33,7 @@ export class CardPack {
         const data = JSON.parse(dataString);
         this.description = data.description;
         this.name = data.name;
+        this.language = data.language;
         this.questions = data.questions.map(q => new QuestionCard(q));
         this.answers = data.answers.map(a => new AnswerCard(a));
     }
@@ -87,6 +89,7 @@ export class CardPack {
         return {
             name: this.name,
             description: this.description,
+            language: this.language,
         };
     }
 

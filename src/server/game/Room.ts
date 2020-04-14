@@ -4,8 +4,12 @@ import {IRoomData} from "../../_types/game/IRoomData";
 import {CardsSelection} from "./cards/CardsSelection";
 import {QuestionCard} from "./cards/QuestionCard";
 import {AnswerCard} from "./cards/AnswerCard";
+import {shuffleArray} from "../services/shuffleArray";
+import {EventManager} from "../../services/EventManager";
 
 export class Room {
+    protected eventManager: EventManager = new EventManager();
+
     protected ID: string;
     protected maxPlayerCount: number = 8;
     protected handSize: number = 12;
@@ -14,9 +18,12 @@ export class Room {
     protected players: Player[] = [];
     protected cardsSelection: CardsSelection;
 
+    // The roles players currently have
+    protected answeringPlayers: {player: Player; revealed: boolean}[] = [];
     protected judge: Player;
-    protected revealed: boolean;
-    protected selectedQuestion: QuestionCard;
+
+    // The drawn question, and answer picked by the judge
+    protected selectedQuestion: QuestionCard | null;
     protected selectedAnswer: AnswerCard[] | null;
 
     /**
@@ -79,14 +86,6 @@ export class Room {
         return this.maxPlayerCount;
     }
 
-    /**
-     * Retrieves whether the cards are currently revealed
-     * @returns Whether the cards are revealed
-     */
-    public areCardsRevealed(): boolean {
-        return this.revealed;
-    }
-
     // Player management
     /**
      * Adds a player to this room
@@ -110,81 +109,109 @@ export class Room {
         socket.on(
             `rooms/${this.ID}/retrieve`,
             (): IRoomData => ({
+                accessibility: {
+                    privat: this.isPrivat,
+                    maxPlayerCount: this.maxPlayerCount,
+                },
+                handSize: this.handSize,
                 ID: this.ID,
                 playerIDs: this.players.map(p => p.getID()),
                 maxPlayerCount: this.maxPlayerCount,
                 judgeID: this.judge?.getID() || null,
-                revealed: this.revealed,
+                answeringPlayers: serializeAnsweringPlayers(this.answeringPlayers),
                 question: this.selectedQuestion?.getText() ?? "",
                 answer: this.selectedAnswer?.map(card => card.getText()) || null,
             }),
             this.ID
         );
+
+        const onlyIfJudge = (func: () => any) => {
+            if (this.getJudge() != player)
+                return {errorMessage: "not permitted", errorCode: -2};
+
+            const res = func();
+            if (res) return res;
+            return {success: true};
+        };
         socket.on(
             `rooms/${this.ID}/pickAnswer`,
-            (playerID: string) => {
-                if (this.getJudge() != player)
-                    return {errorMessage: "not permitted", errorCode: -2};
-                if (this.selectedAnswer != null)
-                    return {errorMessage: "answer was already selected", errorCode: 1};
+            (playerID: string) =>
+                onlyIfJudge(() => {
+                    if (this.selectedAnswer != null)
+                        return {
+                            errorMessage: "answer was already selected",
+                            errorCode: 1,
+                        };
 
-                const p = this.players.find(player => player.getID() == playerID);
-                if (p) this.pickAnswer(p);
-                return {success: true};
-            },
+                    const p = this.players.find(player => player.getID() == playerID);
+                    if (p) this.pickAnswer(p);
+                }),
             this.ID
         );
         socket.on(
             `rooms/${this.ID}/nextRound`,
-            () => {
-                if (this.getJudge() != player)
-                    return {errorMessage: "not permitted", errorCode: -2};
-
-                this.nextRound();
-                return {success: true};
-            },
+            () =>
+                onlyIfJudge(() => {
+                    this.nextRound();
+                }),
             this.ID
         );
         socket.on(
             `rooms/${this.ID}/reveal`,
-            () => {
-                if (this.getJudge() != player)
-                    return {errorMessage: "not permitted", errorCode: -2};
-
-                this.setRevealed(true);
-                return {success: true};
-            },
+            (playerID: string) =>
+                onlyIfJudge(() => {
+                    const p = this.players.find(player => player.getID() == playerID);
+                    if (p) this.revealAnswer(p);
+                }),
             this.ID
         );
+
+        const onlyIfAdmin = (func: () => any) => {
+            if (this.getAdmin() != player)
+                return {errorMessage: "not permitted", errorCode: -1};
+
+            const res = func();
+            if (res) return res;
+            return {success: true};
+        };
         socket.on(
             `rooms/${this.ID}/kickPlayer`,
-            (playerID: string) => {
-                if (this.getAdmin() != player)
-                    return {errorMessage: "not permitted", errorCode: -1};
-
-                const p = this.players.find(player => player.getID() == playerID);
-                if (p) this.kickPlayer(p);
-                return {success: true};
-            },
+            (playerID: string) =>
+                onlyIfAdmin(() => {
+                    const p = this.players.find(player => player.getID() == playerID);
+                    if (p) this.kickPlayer(p);
+                }),
             this.ID
         );
         socket.on(
             `rooms/${this.ID}/resetDeck`,
-            () => {
-                if (this.getAdmin() != player)
-                    return {errorMessage: "not permitted", errorCode: -1};
-
-                this.resetDeck();
-                return {success: true};
-            },
+            () =>
+                onlyIfAdmin(() => {
+                    this.resetDeck();
+                }),
+            this.ID
+        );
+        socket.on(
+            `rooms/${this.ID}/setAccessibility`,
+            ({privat, maxPlayerCount}) =>
+                onlyIfAdmin(() => {
+                    this.setAccessibility(privat, Math.max(2, maxPlayerCount));
+                }),
+            this.ID
+        );
+        socket.on(
+            `rooms/${this.ID}/setHandSize`,
+            handSize =>
+                onlyIfAdmin(() => {
+                    this.setHandSize(Math.min(Math.max(2, handSize), 50));
+                }),
             this.ID
         );
 
         // Share components of this room
         this.cardsSelection.share(player);
 
-        // Stock the hand of the new player
-        this.updateHand(player);
+        this.emitAccesibilityChange();
     }
 
     /**
@@ -212,12 +239,16 @@ export class Room {
         socket.off(`rooms/${this.ID}/reveal`, this.ID);
         socket.off(`rooms/${this.ID}/kickPlayer`, this.ID);
         socket.off(`rooms/${this.ID}/resetDeck`, this.ID);
+        socket.off(`rooms/${this.ID}/setAccessibility`, this.ID);
+        socket.off(`rooms/${this.ID}/setHandSize`, this.ID);
 
         // unshare components of this room
         this.cardsSelection.unshare(player);
 
         // Remove the player's cards
         this.clearHand(player);
+
+        this.emitAccesibilityChange();
     }
 
     /**
@@ -228,7 +259,7 @@ export class Room {
     public kickPlayer(player: Player, message: string = ""): void {
         this.broadcast(`rooms/${this.ID}/kickPlayer`, player.getID(), message);
         player.setRoom(null);
-        if (player == this.getAdmin()) this.nextRound();
+        if (player == this.getJudge()) this.nextRound();
     }
 
     // Game
@@ -272,12 +303,35 @@ export class Room {
     }
 
     /**
-     * Reveals the selected cards
-     * @param Revealed Whether or not the cards are revealed
+     * Sets the players that are currently answering, and whether their answer is revealed
+     * @param players The answering players
      */
-    public setRevealed(revealed: boolean): void {
-        this.revealed = revealed;
-        this.broadcast(`rooms/${this.ID}/setRevealed`, revealed);
+    public setAnsweringPlayers(players?: {player: Player; revealed: boolean}[]): void {
+        if (!players) {
+            players = this.players
+                .filter(p => p != this.judge)
+                .map(p => ({player: p, revealed: false}));
+            shuffleArray(players);
+        }
+
+        this.answeringPlayers = players;
+        this.broadcast(
+            `rooms/${this.ID}/setAnsweringPlayers`,
+            serializeAnsweringPlayers(players)
+        );
+    }
+
+    /**
+     * Reveals the answer of a given player
+     * @param player The player whose answer to reveal
+     */
+    public revealAnswer(player: Player): void {
+        this.setAnsweringPlayers(
+            this.answeringPlayers.map(({player: p, revealed}) => ({
+                player: p,
+                revealed: p == player ? true : revealed,
+            }))
+        );
     }
 
     /**
@@ -309,12 +363,13 @@ export class Room {
         this.selectAnswer(null);
 
         // Return the question card, and choose a new question
-        this.cardsSelection.returnQuestion(this.selectedQuestion);
+        if (this.selectedQuestion)
+            this.cardsSelection.returnQuestion(this.selectedQuestion);
         this.selectQuestion();
 
-        // Choose a new judge and hide cards
+        // Choose a new judge and answering players
         this.selectJudge();
-        this.setRevealed(false);
+        this.setAnsweringPlayers();
     }
 
     /**
@@ -340,7 +395,7 @@ export class Room {
     protected clearHand(player: Player): void {
         player.getHand().forEach(card => this.cardsSelection.returnAnswer(card));
         player.getSelection().forEach(card => this.cardsSelection.returnAnswer(card));
-        player.setSelection([]);
+        player.clearSelection();
         player.setHand([]);
     }
 
@@ -348,11 +403,15 @@ export class Room {
      * Resets the deck, together with all scores
      */
     public resetDeck(): void {
+        // Return the question card
+        if (this.selectedQuestion)
+            this.cardsSelection.returnQuestion(this.selectedQuestion);
+        this.selectedQuestion = null;
+
         // Reset all players data
         this.players.forEach(player => {
             player.setScore(0);
-            player.setSelection([]);
-            player.setHand([]);
+            this.clearHand(player);
         });
 
         // Reset the deck
@@ -360,6 +419,45 @@ export class Room {
 
         // Start the first round
         this.nextRound();
+    }
+
+    /**
+     * Sets the number of cards each player has in their hand
+     * @param handSize The number of cards
+     */
+    public setHandSize(handSize: number): void {
+        this.handSize = handSize;
+        this.broadcast(`rooms/${this.ID}/setHandSize`, handSize);
+        this.players.forEach(player => {
+            if (player.getHand().length > 0) {
+                this.clearHand(player);
+                this.updateHand(player);
+            }
+        });
+    }
+
+    /**
+     * Updates the accessibility data
+     * @param privat Whether this room is private
+     * @param maxPlayerCount The maximal number of players in this room
+     */
+    public setAccessibility(privat: boolean, maxPlayerCount: number): void {
+        this.isPrivat = privat;
+        this.maxPlayerCount = maxPlayerCount;
+        this.broadcast(`rooms/${this.ID}/setAccessibility`, {privat, maxPlayerCount});
+        this.emitAccesibilityChange();
+    }
+
+    /**
+     * Notifies listeners about a potential accessibility change
+     */
+    protected emitAccesibilityChange(): void {
+        this.eventManager.emit(
+            "accessibilityChange",
+            this.isPrivat,
+            this.maxPlayerCount,
+            this.players.length
+        );
     }
 
     // Utility
@@ -373,4 +471,52 @@ export class Room {
             player.getSocket().emit(message, ...args);
         });
     }
+
+    // Event handlers
+    /**
+     * Adds an event listener to detect when room data is altered
+     * @param eventType The accessibility change event
+     * @param listener The listener to register
+     * @param label A label for the listener
+     */
+    public on(
+        eventType: "accessibilityChange",
+        listener: (privat: boolean, maxPlayerCount: number, playerCount: number) => void,
+        label?: string
+    ): void;
+    public on(
+        eventType: string,
+        listener: (...args: any[]) => void,
+        label?: string
+    ): void {
+        this.eventManager.on(eventType, listener, label);
+    }
+
+    /**
+     * Removes a listener from the manager
+     * @param eventType The type of event that was listened to
+     * @param label The label of the listener
+     * @returns Whether a listener was found and removed
+     */
+    public off(eventType: "accessibilityChange", label: string): boolean;
+
+    /**
+     * Removes a listener from the manager
+     * @param eventType The type of event that was listened to
+     * @param listener The listener to be removed
+     * @returns Whether a listener was found and removed
+     */
+    public off(
+        eventType: "accessibilityChange",
+        listener: (...args: any[]) => void
+    ): boolean;
+    public off(
+        eventType: string,
+        listener: ((...args: any[]) => void) | string
+    ): boolean {
+        return this.eventManager.off(eventType, listener as any);
+    }
 }
+
+const serializeAnsweringPlayers = (players: {player: Player; revealed: boolean}[]) =>
+    players.map(({player, revealed}) => ({playerID: player.getID(), revealed}));

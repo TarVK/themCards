@@ -1,52 +1,63 @@
 import {jsx} from "@emotion/core";
-import {FC} from "react";
+import {FC, useState, useRef} from "react";
 import {Player} from "../../model/game/Player";
-import {Persona, PersonaSize} from "@fluentui/react";
+import {Persona, PersonaSize, ContextualMenu} from "@fluentui/react";
 import {DefaultLoader} from "../../components/DefaultLoader";
 import {Application} from "../../model/Application";
 import {IDataHook, useDataHook} from "model-react";
-import {useSyncState} from "../../services/useSyncState";
 import {useTheme} from "../../services/useTheme";
-import {TextField} from "../../components/TextField";
+import {ChangeableName} from "./ChangeableName";
 
-export const PlayerComp: FC<{player: Player}> = ({player}) => {
+export const PlayerComp: FC<{player: Player; plain?: boolean}> = ({player, plain}) => {
     const [h] = useDataHook();
+    const [showContext, setShowContext] = useState(false);
+    const isAdmin = Application.isAdmin(h);
+    const me = Application.getPlayer(h);
     const room = Application.getRoom(h);
     const won = player.hasSelection(room?.getAnswer(h) || [], h);
+    const elRef = useRef(null);
 
+    const isMe = player.is(me);
     const theme = useTheme();
     return (
         <div css={{width: 200, padding: theme.spacing.s1}}>
             <DefaultLoader>
                 {h => (
-                    <Persona
-                        css={{height: "auto"}}
-                        text={player.getName(h)}
-                        secondaryText={`Points: ${player.getScore(h)}`}
-                        size={PersonaSize.size48}
-                        initialsColor={
-                            won ? theme.palette.greenLight : theme.palette.accent
-                        }
-                        onRenderPrimaryText={
-                            player.is(Application.getPlayer(h))
-                                ? () => <ChangeableName player={player} hook={h} />
-                                : undefined
-                        }
-                    />
+                    <div ref={elRef}>
+                        <Persona
+                            onClick={() => !isMe && !plain && setShowContext(true)}
+                            css={{height: "auto"}}
+                            text={player.getName(h)}
+                            secondaryText={`Points: ${player.getScore(h)}`}
+                            size={PersonaSize.size48}
+                            initialsColor={
+                                won ? theme.palette.greenLight : theme.palette.accent
+                            }
+                            onRenderPrimaryText={
+                                isMe && !plain
+                                    ? () => <ChangeableName player={player} hook={h} />
+                                    : undefined
+                            }
+                        />
+                    </div>
                 )}
             </DefaultLoader>
-        </div>
-    );
-};
 
-const ChangeableName: FC<{hook: IDataHook; player: Player}> = ({hook: h, player}) => {
-    const [name, setName] = useSyncState(player?.getName(h) ?? "");
-    return (
-        <TextField
-            value={name}
-            onChange={(e, v) => v !== undefined && setName(v)}
-            onBlur={() => player.setName(name)}
-            underlined
-        />
+            <ContextualMenu
+                items={[
+                    {
+                        key: "kick",
+                        text: "Kick",
+                        disabled: !isAdmin,
+                        onClick: () => {
+                            if (player && room) room.kick(player);
+                        },
+                    },
+                ]}
+                hidden={!showContext}
+                target={elRef}
+                onDismiss={() => setShowContext(false)}
+            />
+        </div>
     );
 };

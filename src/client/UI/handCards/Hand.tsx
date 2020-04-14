@@ -19,11 +19,36 @@ export const Hand: FC = () => {
     const requiredCardCount = room?.getRequiredAnswerCount(h) || 0;
     const selection = player?.getSelection(h) || [];
 
-    const canSelect =
-        !isJudge && !room?.isRevealed(h) && selection.length < requiredCardCount;
+    const selecting = !isJudge && !room?.isRevealed(h);
+    const canSelect = selecting && selection.length < requiredCardCount;
 
     const theme = useTheme();
-    const mobile = useIsMobileView();
+    if (useIsMobileView()) {
+        if (!selecting) return <div />;
+        return (
+            <div
+                css={{
+                    width: "100%",
+                    backgroundColor: theme.palette.themeLighter,
+                    ...(isJudge && {opacity: 0.5, cursor: "no-drop"}),
+                }}>
+                <Stack disableShrink tokens={{childrenGap: "s1"}}>
+                    {cards.map((card, i) => (
+                        <AnswerCard
+                            key={i}
+                            css={canSelect ? {cursor: "pointer"} : undefined}
+                            revealed
+                            onClick={() => {
+                                if (player && canSelect)
+                                    player.setSelection([...selection, card]);
+                            }}>
+                            {card}
+                        </AnswerCard>
+                    ))}
+                </Stack>
+            </div>
+        );
+    }
 
     return (
         <div css={{...(isJudge && {opacity: 0.5, cursor: "no-drop"})}}>

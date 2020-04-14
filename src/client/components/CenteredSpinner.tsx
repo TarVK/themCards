@@ -2,12 +2,14 @@ import {jsx} from "@emotion/core";
 import {FC} from "react";
 import {VerticalCenter} from "./VerticalCenter";
 import {HorizontalCenter} from "./HorizontalCenter";
-import {Spinner} from "@fluentui/react";
+import {Spinner, SpinnerSize} from "@fluentui/react";
 
-export const CenteredSpinner: FC = () => (
+export const CenteredSpinner: FC<{size?: SpinnerSize}> = ({
+    size = SpinnerSize.medium,
+}) => (
     <VerticalCenter>
         <HorizontalCenter>
-            <Spinner />
+            <Spinner size={size} />
         </HorizontalCenter>
     </VerticalCenter>
 );

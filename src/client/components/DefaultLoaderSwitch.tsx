@@ -12,6 +12,10 @@ export const DefaultLoaderSwitch: FC<{
     getExceptions?: () => any[];
 }> = ({
     onLoad = <CenteredSpinner />,
-    onError = e => <FormattedError>{e.join(", ")}</FormattedError>,
+    onError = e => (
+        <FormattedError>
+            {e.map(e => e.errorMessage || e.toString()).join(", ")}
+        </FormattedError>
+    ),
     ...rest
 }) => <LoaderSwitch onLoad={onLoad} onError={onError} {...rest} />;

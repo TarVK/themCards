@@ -22,6 +22,7 @@ export class ApplicationClass extends SocketModel {
         return this.room.addAction(async () => {
             const resp = await this.socket.emitAsync("rooms/connect", ID);
             if (resp.success) {
+                location.hash = resp.ID;
                 return Room.joinRoom(resp.ID);
             } else {
                 throw resp;

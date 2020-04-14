@@ -12,7 +12,7 @@ export const RoomName: FC = () => {
     const [name, setName] = useSyncState(room?.getID());
 
     return (
-        <div css={{display: "inline-block", width: 200}}>
+        <div css={{display: "inline-block", width: 195}}>
             <TextField
                 value={name}
                 onChange={(e, v) => v !== undefined && setName(v)}

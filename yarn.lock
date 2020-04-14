@@ -3498,9 +3498,9 @@ mkdirp@^0.5.1, mkdirp@^0.5.3:
     minimist "^1.2.5"
 
 model-react@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/model-react/-/model-react-3.0.1.tgz#9cb320853e907dbb84052bfea2f33e7a577a3f7c"
-  integrity sha512-yoBOYwwwZouYdtWDeU7fTArna3YApW567CAXKycPZYMIphTkgKEi80apVIYd8d6qYvYoBr2Z1DdAZWPRtL+BUQ==
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/model-react/-/model-react-3.0.2.tgz#c699c8028020ff8450a429e5facb48f6a0bd9f66"
+  integrity sha512-kE0PbOuueZKR8F8M6i1NykYYLIhSX6yJhm8EhtqakuRNDd2UWxqKaXc1rg8sNSXfzGCijWzrLxM0iBt4rLN8Xg==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -4022,16 +4022,6 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-performance-now@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-0.2.0.tgz#33ef30c5c77d4ea21c5a53869d91b56d8f2555e5"
-  integrity sha1-M+8wxcd9TqIcWlOGnZG1bY8lVeU=
-
-performance-now@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
-  integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
-
 picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.0.7:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.2.2.tgz#21f333e9b6b8eaff02468f5146ea406d345f4dad"
@@ -4110,7 +4100,7 @@ promise-inflight@^1.0.1:
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
   integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
 
-prop-types@^15.5.8, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -4216,13 +4206,6 @@ querystringify@^2.1.1:
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.1.tgz#60e5a5fd64a7f8bfa4d2ab2ed6fdf4c85bad154e"
   integrity sha512-w7fLxIRCRT7U8Qu53jQnJyPkYZIaR4n5151KMfcJlO/A9397Wxb1amJvROTK6TOnp7PfoAmg/qXiNHI+08jRfA==
 
-raf@^3.1.0:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/raf/-/raf-3.4.1.tgz#0742e99a4a6552f445d73e3ee0328af0ff1ede39"
-  integrity sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==
-  dependencies:
-    performance-now "^2.1.0"
-
 randomatic@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-3.1.1.tgz#b776efc59375984e36c537b2f51a1f0aff0da1ed"
@@ -4282,31 +4265,10 @@ react-dom@^16.13.0:
     prop-types "^15.6.2"
     scheduler "^0.19.1"
 
-react-horizontal-scrolling-menu@^0.7.7:
-  version "0.7.7"
-  resolved "https://registry.yarnpkg.com/react-horizontal-scrolling-menu/-/react-horizontal-scrolling-menu-0.7.7.tgz#3c74c877b414fe4418d81a0cfe07eecf34b23657"
-  integrity sha512-NuxQDQYOCWx1cbkLtgrzDWgWF5uE62s48NR3ljmV92idCKEV75BFmv/Z77aTsUlCKdxPG379VB+jIjtcG2ncmA==
-
 react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
-
-react-motion@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/react-motion/-/react-motion-0.5.2.tgz#0dd3a69e411316567927917c6626551ba0607316"
-  integrity sha512-9q3YAvHoUiWlP3cK0v+w1N5Z23HXMj4IF4YuvjvWegWqNPfLXsOBE/V7UvQGpXxHFKRQQcNcVQE31g9SB/6qgQ==
-  dependencies:
-    performance-now "^0.2.0"
-    prop-types "^15.5.8"
-    raf "^3.1.0"
-
-react-scroll-horizontal@^1.6.4:
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/react-scroll-horizontal/-/react-scroll-horizontal-1.6.4.tgz#a02e979b3a4f8a20c15ccc1753ec5f1ac99d96f3"
-  integrity sha512-7fpBk8Nrqmi/ICTuFMIDMhq2+4F+6bhE0BwCKvGmTXi6aI6bi0BbtNv8prqL4VGPkc+bjeeqUYwhM5NDsU5MRQ==
-  dependencies:
-    react-motion "^0.5.2"
 
 react@^16.13.0:
   version "16.13.1"

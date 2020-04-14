@@ -1,34 +1,29 @@
 import {jsx} from "@emotion/core";
-import {FC, useEffect, useState} from "react";
+import {FC, Fragment} from "react";
 import {Application} from "../../../model/Application";
 import {useDataHook} from "model-react";
-import {DefaultLoaderSwitch} from "../../../components/DefaultLoaderSwitch";
 import {Pack} from "./Pack";
-import {Modal} from "@fluentui/react";
+import {useTheme} from "../../../services/useTheme";
 
-export const PackSelection: FC = () => {
+export const PackSelection: FC<{filter?: string}> = ({filter = ""}) => {
     const [h, c] = useDataHook();
 
     // Retrieve all relevant data
     const room = Application.getRoom(h);
-    const admin = room?.getAdmin(h);
-    const player = Application.getPlayer(h);
+    const isAdmin = Application.isAdmin(h);
     const cardsSelection = room?.getCardSelection();
 
     // Retrieve the packs
     const allPacks = cardsSelection?.getAvailable() || [];
     const selectedPacks = cardsSelection?.getSelection(h) || [];
 
-    // Open the packs if no selection was made yet
-    const [isOpen, setOpen] = useState(true);
-    useEffect(() => {
-        if (room && selectedPacks.length == 0) setOpen(true);
-    }, [room, selectedPacks.length == 0]);
-
     return (
-        <Modal isOpen={isOpen} onDismiss={() => setOpen(false)}>
-            <DefaultLoaderSwitch {...c}>
-                {allPacks.map(pack => {
+        <div>
+            {allPacks
+                .filter(pack =>
+                    (pack.name + " " + pack.language).toLowerCase().includes(filter)
+                )
+                .map(pack => {
                     const selected =
                         selectedPacks.find(p => p.name == pack.name) != undefined;
                     return (
@@ -36,7 +31,7 @@ export const PackSelection: FC = () => {
                             key={pack.name}
                             pack={pack}
                             onToggle={() => {
-                                if (cardsSelection && player && player.is(admin)) {
+                                if (cardsSelection && isAdmin) {
                                     if (selected)
                                         cardsSelection.setSelection(
                                             selectedPacks.filter(p => p.name != pack.name)
@@ -52,7 +47,6 @@ export const PackSelection: FC = () => {
                         />
                     );
                 })}
-            </DefaultLoaderSwitch>
-        </Modal>
+        </div>
     );
 };

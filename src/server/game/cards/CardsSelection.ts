@@ -5,6 +5,8 @@ import {Room} from "../Room";
 import {Player} from "../Player";
 import {ICardSelectionData} from "../../../_types/game/ICardSelectionData";
 import {ICardPackData} from "../../../_types/game/ICardPackData";
+import {BlankQuestionCard} from "./BlankQuestionCard";
+import {BlankAnswerCard} from "./BlankAnswerCard";
 
 export class CardsSelection {
     protected room: Room;
@@ -94,7 +96,7 @@ export class CardsSelection {
         const index = Math.floor(Math.random() * this.availableQuestions.length);
         const card = this.availableQuestions[index];
         this.availableQuestions.splice(index, 1);
-        return card;
+        return card || new BlankQuestionCard();
     }
 
     /**
@@ -106,7 +108,7 @@ export class CardsSelection {
         const index = Math.floor(Math.random() * this.availableAnswers.length);
         const card = this.availableAnswers[index];
         this.availableAnswers.splice(index, 1);
-        return card;
+        return card || new BlankAnswerCard();
     }
 
     /**
@@ -114,7 +116,7 @@ export class CardsSelection {
      * @param card The card that was used
      */
     public returnQuestion(card: QuestionCard): void {
-        this.usedQuestions.push(card);
+        if (!(card instanceof BlankQuestionCard)) this.usedQuestions.push(card);
     }
 
     /**
@@ -122,7 +124,7 @@ export class CardsSelection {
      * @param card The card that was used
      */
     public returnAnswer(card: AnswerCard): void {
-        this.usedAnswers.push(card);
+        if (!(card instanceof BlankAnswerCard)) this.usedAnswers.push(card);
     }
 
     /**
@@ -147,5 +149,7 @@ export class CardsSelection {
             (cards, pack) => [...cards, ...pack.getQuestions()],
             []
         );
+        this.usedQuestions = [];
+        this.usedAnswers = [];
     }
 }
