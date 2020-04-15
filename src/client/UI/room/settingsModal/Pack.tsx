@@ -14,6 +14,7 @@ export const Pack: FC<{pack: ICardPackData; onToggle: () => void; selected: bool
         onClick={onToggle}
         elevation="elevation8"
         css={(theme: ITheme) => ({
+            verticalAlign: "top",
             padding: theme.spacing.m,
             height: 150,
             margin: theme.spacing.s1,
