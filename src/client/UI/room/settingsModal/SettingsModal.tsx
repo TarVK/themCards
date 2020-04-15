@@ -108,7 +108,13 @@ export const SettingsModal: FC = () => {
                     {/* We don't want an actual field to auto focus, so this is a dirty fix */}
                     <FakeFocus />
 
-                    <Title css={{marginTop: theme.spacing.m}}>Card packs selection</Title>
+                    <Title
+                        css={{
+                            marginTop: theme.spacing.m,
+                            marginBottom: theme.spacing.s1,
+                        }}>
+                        Card packs selection
+                    </Title>
                     <SearchBox
                         placeholder="Search"
                         underlined
@@ -121,7 +127,8 @@ export const SettingsModal: FC = () => {
                             flexShrink: 1,
                             minHeight: 0,
                             overflow: "auto",
-                        }}>
+                        }}
+                        data-is-scrollable={true}>
                         <PackSelection filter={search.toLowerCase()} />
                     </div>
                 </div>
