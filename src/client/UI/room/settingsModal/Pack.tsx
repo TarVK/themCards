@@ -16,7 +16,7 @@ export const Pack: FC<{pack: ICardPackData; onToggle: () => void; selected: bool
         css={(theme: ITheme) => ({
             verticalAlign: "top",
             padding: theme.spacing.m,
-            height: 150,
+            minHeight: 120,
             margin: theme.spacing.s1,
             display: "inline-block",
             boxSizing: "border-box",
