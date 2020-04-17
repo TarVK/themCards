@@ -2,7 +2,7 @@
 
 You know, them cards
 
-Playable at [themCards.herokuapp.com](http://themcards.herokuapp.com/). More card packs coming in the future (if there is traffic, or people submit card packs).
+Playable at [themCards.herokuapp.com](http://themcards.herokuapp.com/). More card packs coming in the future (if there is traffic, or people submit card packs), currently dutch and english packs exist.
 
 ## Game play
 
@@ -28,12 +28,14 @@ The settings of the room appear as a modal. Here a couple of room setting scan b
 ### Desktop UI
 
 The desktop UI shows the room/players in a sidebar on the right. In the main area we first see the selected question card, followed by the selections made by all players and the player's own hand. These answer cards sections can overflow to the right, but can be scrolled through using the mousewheel.
+
 ![Desktop selection]("/../documentation/screenshots/desktopSelection.png)
 ![Desktop selection]("/../documentation/screenshots/desktopJudging.png)
 
 ### Mobile UI
 
 The mobile UI has a collapsible sidebar showing the room/players. The main area always contains the selected question card on the top, followed by an answer cards area. If the judge hasn't revealed any cards yet, this area is occupied by the player's hand and own selection. Once the judge revealed any cards, the player's hand disappears and the selection of each player is shown instead.
+
 ![Desktop selection]("/../documentation/screenshots/mobileSelection.png)
 ![Desktop selection]("/../documentation/screenshots/mobileChosen.png)
 
