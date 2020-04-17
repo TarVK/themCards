@@ -72,7 +72,16 @@ export async function startApplication(server?: HTTPServer): Promise<void> {
         con.on("disconnect", () => {
             const room = player.getRoom();
             if (room) room.removePlayer(player);
-            console.log("Disconnected", player.getID());
+            console.log(
+                "Disconnected",
+                player.getID(),
+                ", rooms:",
+                Object.values(rooms.all)
+                    .map(
+                        room => room.getPlayers().length + (room.isPrivate() ? "-P" : "")
+                    )
+                    .join(",")
+            );
         });
         con.on("players/me", () => {
             return player.getID();
