@@ -7,6 +7,7 @@ import {ICardSelectionData} from "../../../_types/game/ICardSelectionData";
 import {ICardPackData} from "../../../_types/game/ICardPackData";
 import {BlankQuestionCard} from "./BlankQuestionCard";
 import {BlankAnswerCard} from "./BlankAnswerCard";
+import {withErrorHandling} from "../../services/withErrorHandling";
 
 export class CardsSelection {
     protected room: Room;
@@ -39,21 +40,23 @@ export class CardsSelection {
         const socket = player.getSocket();
         socket.on(
             `cardSelection/${this.room.getID()}/retrieve`,
-            (): ICardSelectionData => ({
-                selection: this.selectedPacks.map(pack => pack.getData()),
-                availablePacks: this.availablePacks.map(pack => pack.getData()),
-            }),
+            (): ICardSelectionData =>
+                withErrorHandling(() => ({
+                    selection: this.selectedPacks.map(pack => pack.getData()),
+                    availablePacks: this.availablePacks.map(pack => pack.getData()),
+                })),
             this.room.getID()
         );
         socket.on(
             `cardSelection/${this.room.getID()}/selectionChange`,
-            (selection: ICardPackData[]) => {
-                if (this.room.getAdmin() != player)
-                    return {errorMessage: "not permitted", errorCode: -1};
+            (selection: ICardPackData[]) =>
+                withErrorHandling(() => {
+                    if (this.room.getAdmin() != player)
+                        return {errorMessage: "not permitted", errorCode: -1};
 
-                this.setSelection(selection);
-                return {success: true};
-            },
+                    this.setSelection(selection);
+                    return {success: true};
+                }),
             this.room.getID()
         );
     }

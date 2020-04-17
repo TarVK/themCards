@@ -6,6 +6,7 @@ import {QuestionCard} from "./cards/QuestionCard";
 import {AnswerCard} from "./cards/AnswerCard";
 import {shuffleArray} from "../services/shuffleArray";
 import {EventManager} from "../../services/EventManager";
+import {withErrorHandling} from "../services/withErrorHandling";
 
 export class Room {
     protected eventManager: EventManager = new EventManager();
@@ -108,20 +109,21 @@ export class Room {
         const socket = player.getSocket();
         socket.on(
             `rooms/${this.ID}/retrieve`,
-            (): IRoomData => ({
-                accessibility: {
-                    privat: this.isPrivat,
+            (): IRoomData =>
+                withErrorHandling(() => ({
+                    accessibility: {
+                        privat: this.isPrivat,
+                        maxPlayerCount: this.maxPlayerCount,
+                    },
+                    handSize: this.handSize,
+                    ID: this.ID,
+                    playerIDs: this.players.map(p => p.getID()),
                     maxPlayerCount: this.maxPlayerCount,
-                },
-                handSize: this.handSize,
-                ID: this.ID,
-                playerIDs: this.players.map(p => p.getID()),
-                maxPlayerCount: this.maxPlayerCount,
-                judgeID: this.judge?.getID() || null,
-                answeringPlayers: serializeAnsweringPlayers(this.answeringPlayers),
-                question: this.selectedQuestion?.getText() ?? "",
-                answer: this.selectedAnswer?.map(card => card.getText()) || null,
-            }),
+                    judgeID: this.judge?.getID() || null,
+                    answeringPlayers: serializeAnsweringPlayers(this.answeringPlayers),
+                    question: this.selectedQuestion?.getText() ?? "",
+                    answer: this.selectedAnswer?.map(card => card.getText()) || null,
+                })),
             this.ID
         );
 
@@ -129,7 +131,7 @@ export class Room {
             if (this.getJudge() != player)
                 return {errorMessage: "not permitted", errorCode: -2};
 
-            const res = func();
+            const res = withErrorHandling(func);
             if (res) return res;
             return {success: true};
         };
@@ -170,7 +172,7 @@ export class Room {
             if (this.getAdmin() != player)
                 return {errorMessage: "not permitted", errorCode: -1};
 
-            const res = func();
+            const res = withErrorHandling(func);
             if (res) return res;
             return {success: true};
         };
@@ -280,7 +282,7 @@ export class Room {
         }
 
         this.judge = judge;
-        this.broadcast(`rooms/${this.ID}/setJudge`, judge.getID());
+        this.broadcast(`rooms/${this.ID}/setJudge`, judge?.getID());
     }
 
     /**

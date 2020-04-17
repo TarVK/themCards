@@ -3,6 +3,7 @@ import {uuid} from "uuidv4";
 import {Room} from "./Room";
 import {IPlayerData} from "../../_types/game/IPlayerData";
 import {AnswerCard} from "./cards/AnswerCard";
+import {withErrorHandling} from "../services/withErrorHandling";
 
 export class Player {
     protected ID: string = uuid();
@@ -32,14 +33,18 @@ export class Player {
      * Listens for socket events affecting the player's properties
      */
     protected initSocketListener() {
-        this.socket.on(`players/${this.ID}/setName`, (name: string) => {
-            this.setName(name);
-            return {success: true};
-        });
-        this.socket.on(`players/${this.ID}/setSelection`, (selection: string[]) => {
-            this.setSelection(selection);
-            return {success: true};
-        });
+        this.socket.on(`players/${this.ID}/setName`, (name: string) =>
+            withErrorHandling(() => {
+                this.setName(name);
+                return {success: true};
+            })
+        );
+        this.socket.on(`players/${this.ID}/setSelection`, (selection: string[]) =>
+            withErrorHandling(() => {
+                this.setSelection(selection);
+                return {success: true};
+            })
+        );
 
         // Make sure the player can request their own data
         this.share(this);
@@ -52,13 +57,17 @@ export class Player {
     public share(player: Player): void {
         player.getSocket().on(
             `players/${this.ID}/retrieve`,
-            (): IPlayerData => ({
-                ID: this.ID,
-                name: this.name,
-                score: this.score,
-                selection: this.selection.map(card => card.getText()),
-                hand: player == this ? this.hand.map(card => card.getText()) : undefined,
-            }),
+            (): IPlayerData =>
+                withErrorHandling(() => ({
+                    ID: this.ID,
+                    name: this.name,
+                    score: this.score,
+                    selection: this.selection.map(card => card.getText()),
+                    hand:
+                        player == this
+                            ? this.hand.map(card => card.getText())
+                            : undefined,
+                })),
             this.ID
         );
     }
