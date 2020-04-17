@@ -74,7 +74,8 @@ export const SettingsModal: FC = () => {
                             disabled={!isAdmin}
                             onChange={(e, v) => v !== undefined && setHandSize(Number(v))}
                             onBlur={() => {
-                                if (room) room.setHandSize(handSize);
+                                if (room && room.getHandSize(null) != handSize)
+                                    room.setHandSize(handSize);
                             }}
                         />
 

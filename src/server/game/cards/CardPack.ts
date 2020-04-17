@@ -58,11 +58,19 @@ export class CardPack {
     }
 
     /**
-     * Retrieves the description of th pack
+     * Retrieves the description of this pack
      * @returns The description
      */
     public getDescription(): string {
         return this.description;
+    }
+
+    /**
+     * Retrieves the language of this pack
+     * @returns The language
+     */
+    public getLanguage(): string {
+        return this.language;
     }
 
     /**

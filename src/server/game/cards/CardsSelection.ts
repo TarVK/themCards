@@ -26,7 +26,9 @@ export class CardsSelection {
         this.room = room;
 
         // Select a standard pack
-        this.selectedPacks = this.availablePacks.slice(0, 1);
+        this.selectedPacks = this.availablePacks.filter(
+            p => p.getLanguage().toLowerCase() == "english"
+        );
     }
 
     /**

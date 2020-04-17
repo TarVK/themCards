@@ -248,6 +248,12 @@ export class Room {
         // Remove the player's cards
         this.clearHand(player);
 
+        // Remove the player from answering players, and potentially move to the next round
+        this.setAnsweringPlayers(
+            this.answeringPlayers.filter(({player}) => this.players.includes(player))
+        );
+        if (player == this.getJudge()) this.nextRound();
+
         this.emitAccesibilityChange();
     }
 

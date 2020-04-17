@@ -8,6 +8,10 @@ console.log("Starting");
 const app = express();
 app.use(express.static(Path.join(process.cwd(), "public")));
 
+app.get("/ping", (req, resp) => {
+    resp.json({type: "pong", timestamp: Date.now()});
+});
+
 if (domain.resources.port == domain.socket.port) {
     const server = http.createServer(app);
     startApplication(server);
