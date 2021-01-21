@@ -30,7 +30,7 @@
         "model-react": "^3.0.1",
         "react": "^16.13.0",
         "react-dom": "^16.13.0",
-        "socket.io": "^2.3.0",
+        "socket.io": "^2.4.0",
         "socket.io-client": "^2.3.0",
         "uuidv4": "^6.0.6"
     },
