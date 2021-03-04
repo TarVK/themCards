@@ -76,7 +76,7 @@
         "Hello my name is Bobby, and _ is my hobby",
         "Bruce, why do we _?",
         "The book report on _",
-        "I kissed _ and I liked it.",
+        "I kissed _ and I liked it",
         "_ _, yes I know that expression. Yes, I know it well.",
         "'_!' screamed _ in the living room",
         "I'm scared of everything. I'm scared of _. I'm scared of _. And most of all I'm scared of _.",
@@ -85,7 +85,8 @@
         "All religions were wrong, _ is our god",
         "Is there _ after death",
         "Are we human or are we _",
-        "It's a bird. It's a plane. It's _"
+        "It's a bird. It's a plane. It's _",
+        "_ a day keeps _ away"
     ],
     "answers": [
         "choosers",
