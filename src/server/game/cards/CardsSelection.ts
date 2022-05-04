@@ -97,7 +97,7 @@ export class CardsSelection {
      * @returns The question card
      */
     public drawQuestion(): QuestionCard {
-        if (this.availableQuestions.length == 0) this.restock();
+        if (this.availableQuestions.length == 0) this.resetQuestions();
         const index = Math.floor(Math.random() * this.availableQuestions.length);
         const card = this.availableQuestions[index];
         this.availableQuestions.splice(index, 1);
@@ -109,7 +109,7 @@ export class CardsSelection {
      * @returns The answer card
      */
     public drawAnswer(): AnswerCard {
-        if (this.availableAnswers.length == 0) this.restock();
+        if (this.availableAnswers.length == 0) this.resetAnswers();
         const index = Math.floor(Math.random() * this.availableAnswers.length);
         const card = this.availableAnswers[index];
         this.availableAnswers.splice(index, 1);
@@ -146,15 +146,29 @@ export class CardsSelection {
      * Resets the drawn cards and returned cards, to the new selection
      */
     public resetDeck(): void {
-        this.availableAnswers = this.selectedPacks.reduce(
-            (cards, pack) => [...cards, ...pack.getAnswers()],
-            []
-        );
+        this.resetAnswers();
+        this.resetQuestions();
+    }
+
+    /**
+     * Resets the question cards
+     */
+    protected resetQuestions(): void {
         this.availableQuestions = this.selectedPacks.reduce(
             (cards, pack) => [...cards, ...pack.getQuestions()],
             []
         );
         this.usedQuestions = [];
+    }
+
+    /**
+     * Resets the answer cards
+     */
+    protected resetAnswers(): void {
+        this.availableAnswers = this.selectedPacks.reduce(
+            (cards, pack) => [...cards, ...pack.getAnswers()],
+            []
+        );
         this.usedAnswers = [];
     }
 }
