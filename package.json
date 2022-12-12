@@ -26,7 +26,7 @@
         "@emotion/core": "^10.0.28",
         "@fluentui/react": "^7.106.0",
         "emotion-theming": "^10.0.27",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "model-react": "^3.0.1",
         "react": "^16.13.0",
         "react-dom": "^16.13.0",
